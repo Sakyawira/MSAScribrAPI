@@ -17,6 +17,7 @@ namespace ScribrAPI.Helper
             Console.ReadLine();
         }
 
+        // Get the video id from a url
         public static String GetVideoIdFromURL(String videoURL) {
             // Extract the string after the '=' sign
             // e.g. https://www.youtube.com/watch?v=ehvz3iN8pp4 becomes ehvz3iN8pp4 
@@ -95,9 +96,10 @@ namespace ScribrAPI.Helper
             return (subtitleURL);
         }
 
+        // Get video from video id
         public static Video GetVideoInfo(String videoId)
         {
-            String APIKey = "AIzaSyBR8fLO7PlD_nttYr7P70c3gMSLyQuGHxg";
+            String APIKey = "AIzaSyBqwfIVpvsm_0sbGEGAfr08qivmYmKdXEQ";
             String YouTubeAPIURL = "https://www.googleapis.com/youtube/v3/videos?id=" + videoId + "&key=" + APIKey + "&part=snippet,contentDetails";
 
             // Use an http client to grab the JSON string from the web.
