@@ -163,10 +163,10 @@ namespace ScribrAPI.Controllers
         public async Task<ActionResult<Video>> DeleteVideo(int id)
         {
             List<int> videoIDlist = new List<int>(new int[] { 1, 10, 11, 12, 15 });
-            if (videoIDlist.Contains(id))
-            {
-                return BadRequest("The video cannot be deleted");
-            }
+            //if (videoIDlist.Contains(id))
+            //{
+            //    return BadRequest("The video cannot be deleted");
+            //}
 
             var video = await _context.Video.FindAsync(id);
             if (video == null)
