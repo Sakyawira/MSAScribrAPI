@@ -27,6 +27,24 @@ namespace ScribrAPI.Controllers
             return await _context.Transcription.ToListAsync();
         }
 
+        // GET api/Videos/SearchByTranscriptions/HelloWorld
+        [HttpGet("GetRandomTranscription")]
+        public async Task<ActionResult<Transcription>> GetRandom()
+        {
+            Random rnd = new Random();
+
+            int id = 4200 + (2 * (rnd.Next(11, 99)) + 1);
+
+             var transcription = await _context.Transcription.FindAsync(id);
+
+            if (transcription == null)
+            {
+                return NotFound();
+            }
+
+            return transcription;
+        }
+
         // GET: api/Transcriptions/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Transcription>> GetTranscription(int id)

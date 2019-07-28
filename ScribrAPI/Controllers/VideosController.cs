@@ -13,6 +13,7 @@ using ScribrAPI.Helper;
 namespace ScribrAPI.Controllers
 {
     // DTO (Data Transfer object) inner class to help with Swagger documentation
+    // Allow swagger ui to recognize the url to display it in the swagger ui
     public class URLDTO
     {
         public String URL { get; set; }
@@ -115,7 +116,9 @@ namespace ScribrAPI.Controllers
                 videoURL = data.URL;
                 videoId = YouTubeHelper.GetVideoIdFromURL(videoURL);
                 video = YouTubeHelper.GetVideoInfo(videoId);
-            } catch {
+            }
+            catch
+            {
                 return BadRequest("Invalid YouTube URL");
             }
 
@@ -128,6 +131,8 @@ namespace ScribrAPI.Controllers
             // Add this video object to the database
             _context.Video.Add(video);
             await _context.SaveChangesAsync();
+
+           // video.VideoId = video.VideoId % 10;
 
             // Get the primary key of the newly created video record
             int id = video.VideoId;
@@ -167,7 +172,7 @@ namespace ScribrAPI.Controllers
             //{
             //    return BadRequest("The video cannot be deleted");
             //}
-
+             //_context.Video.
             var video = await _context.Video.FindAsync(id);
             if (video == null)
             {
@@ -205,6 +210,9 @@ namespace ScribrAPI.Controllers
             return Ok(videos);
 
         }
+
+
+
 
         private bool VideoExists(int id)
         {
