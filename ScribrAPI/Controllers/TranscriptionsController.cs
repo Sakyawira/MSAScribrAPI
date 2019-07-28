@@ -31,15 +31,25 @@ namespace ScribrAPI.Controllers
         [HttpGet("GetRandomTranscription")]
         public async Task<ActionResult<Transcription>> GetRandom()
         {
-            Random rnd = new Random();
+            bool isGet = false;
 
-            int id = 4200 + (2 * (rnd.Next(11, 99)) + 1);
+            // initialize transcription
+            var transcription = await _context.Transcription.FindAsync(0);
 
-             var transcription = await _context.Transcription.FindAsync(id);
-
-            if (transcription == null)
+            // only break after it finds a non-null transcription
+            while (isGet == false)
             {
-                return NotFound();
+                // Randomize the id
+                Random rnd = new Random();
+                int id = 4200 + (2 * (rnd.Next(11, 99)) + 1);
+
+                // Find the transcription based on the generated id
+                transcription = await _context.Transcription.FindAsync(id);
+
+                if (transcription != null)
+                {
+                    isGet = true;
+                }
             }
 
             return transcription;
