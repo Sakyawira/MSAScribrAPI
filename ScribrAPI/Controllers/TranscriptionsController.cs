@@ -27,31 +27,31 @@ namespace ScribrAPI.Controllers
             return await _context.Transcription.ToListAsync();
         }
 
-        // GET api/Videos/SearchByTranscriptions/HelloWorld
+        // GET api/Transcriptions/GetRandomTranscription
         [HttpGet("GetRandomTranscription")]
         public async Task<ActionResult<Transcription>> GetRandom()
         {
-            bool isGet = false;
+            var sizeOfList = _context.Transcription.ToListAsync().Result.Count;
+            bool isget = false;
 
             // initialize transcription
             var transcription = await _context.Transcription.FindAsync(0);
 
             // only break after it finds a non-null transcription
-            while (isGet == false)
+            while (isget == false)
             {
-                // Randomize the id
+                // randomize the id
                 Random rnd = new Random();
-                int id = 4200 + (2 * (rnd.Next(11, 99)) + 1);
+                int id = _context.Transcription.ToListAsync().Result[rnd.Next(0, sizeOfList)].TranscriptionId;
 
-                // Find the transcription based on the generated id
+                // find the transcription based on the generated id
                 transcription = await _context.Transcription.FindAsync(id);
 
                 if (transcription != null)
                 {
-                    isGet = true;
+                    isget = true;
                 }
             }
-
             return transcription;
         }
 
