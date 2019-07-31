@@ -29,7 +29,7 @@ namespace ScribrAPI.Controllers
 
         // GET api/Transcriptions/GetRandomTranscription
         [HttpGet("GetRandomTranscription")]
-        public async Task<ActionResult<Transcription>> GetRandom()
+        public async Task<ActionResult<IEnumerable<Video>>> GetRandom()
         {
             var sizeOfList = _context.Transcription.ToListAsync().Result.Count;
             bool isget = false;
@@ -52,7 +52,29 @@ namespace ScribrAPI.Controllers
                     isget = true;
                 }
             }
-            return transcription;
+
+            if (String.IsNullOrEmpty(transcription.Phrase))
+            {
+                return BadRequest("Search string cannot be null or empty.");
+            }
+
+            // Choose transcriptions that has the phrase 
+            var videos = await _context.Video.Include(video => video.Transcription).Select(video => new Video
+            {
+                VideoId = video.VideoId,
+                VideoTitle = video.VideoTitle,
+                VideoLength = video.VideoLength,
+                WebUrl = video.WebUrl,
+                ThumbnailUrl = video.ThumbnailUrl,
+                IsFavourite = video.IsFavourite,
+                Transcription = video.Transcription.Where(tran => tran.Phrase.Contains(transcription.Phrase)).ToList()
+            }).ToListAsync();
+
+            // Removes all videos with empty transcription
+            videos.RemoveAll(video => video.Transcription.Count == 0);
+            videos.RemoveRange(1, videos.Count - 1);
+            return Ok(videos);
+
         }
 
         // GET: api/Transcriptions/5
@@ -129,5 +151,8 @@ namespace ScribrAPI.Controllers
         {
             return _context.Transcription.Any(e => e.TranscriptionId == id);
         }
+
+      
     }
+
 }
