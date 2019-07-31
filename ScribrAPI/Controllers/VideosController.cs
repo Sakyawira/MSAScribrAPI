@@ -258,7 +258,7 @@ namespace ScribrAPI.Controllers
                 WebUrl = video.WebUrl,
                 ThumbnailUrl = video.ThumbnailUrl,
                 IsFavourite = false,
-                // Transcription = video.Transcription
+                Transcription = video.Transcription
             }).ToListAsync();
 
             // only break after it finds a non-null transcription
