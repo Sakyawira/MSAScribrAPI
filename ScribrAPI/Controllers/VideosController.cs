@@ -41,33 +41,7 @@ namespace ScribrAPI.Controllers
             return await _context.Video.ToListAsync();
         }
 
-        // GET: api/Videos
-        [HttpGet("GetRandomVideo")]
-        public async Task<ActionResult<Video>> GetRandomVideo()
-        {
-            var sizeOfList = _context.Video.ToListAsync().Result.Count;
-            bool isget = false;
-
-            // initialize transcription
-            var video = await _context.Video.FindAsync(0);
-
-            // only break after it finds a non-null transcription
-            while (isget == false)
-            {
-                // randomize the id
-                Random rnd = new Random();
-                int id = _context.Video.ToListAsync().Result[rnd.Next(0, sizeOfList)].VideoId;
-
-                // find the transcription based on the generated id
-                video = await _context.Video.FindAsync(id);
-
-                if (video != null)
-                {
-                    isget = true;
-                }
-            }
-            return video;
-        }
+     
 
         // GET: api/Videos/5
         [HttpGet("{id}")]
@@ -115,26 +89,27 @@ namespace ScribrAPI.Controllers
 
         //PUT with PATCH to handle CancelisFavourite
         [HttpPatch("CancelFav/")]
-        public VideoDTO Cancel([FromBody]JsonPatchDocument<VideoDTO> videoPatch)
+        public async Task<IActionResult> Cancel([FromBody]JsonPatchDocument<VideoDTO> videoPatch)
         {
             var sizeOfList = _context.Video.ToListAsync().Result.Count;
-            Video originVideo = videoRepository.GetVideoByID(_context.Video.ToListAsync().Result[0].VideoId);
-            VideoDTO videoDTO = _mapper.Map<VideoDTO>(originVideo);
+            //Video originVideo = videoRepository.GetVideoByID(_context.Video.ToListAsync().Result[sizeOfList-1].VideoId);
+            //VideoDTO videoDTO = _mapper.Map<VideoDTO>(originVideo);
             for (int i = 0; i <= sizeOfList; i++)
             {
-                //get original video object from the database
-                originVideo = videoRepository.GetVideoByID(_context.Video.ToListAsync().Result[i].VideoId);
-                //use automapper to map that to DTO object
-                videoDTO = _mapper.Map<VideoDTO>(originVideo);
-                //apply the patch to that DTO
-                videoPatch.ApplyTo(videoDTO);
-                //use automapper to map the DTO back ontop of the database object
-                _mapper.Map(videoDTO, originVideo);
-                //update video in the database
-                _context.Update(originVideo);
-                _context.SaveChanges();
+                Patch(_context.Video.ToListAsync().Result[i].VideoId, videoPatch);
+                ////get original video object from the database
+                //originVideo = videoRepository.GetVideoByID(_context.Video.ToListAsync().Result[i].VideoId);
+                ////use automapper to map that to DTO object
+                //videoDTO = _mapper.Map<VideoDTO>(originVideo);
+                ////apply the patch to that DTO
+                //videoPatch.ApplyTo(videoDTO);
+                ////use automapper to map the DTO back ontop of the database object
+                //_mapper.Map(videoDTO, originVideo);
+                ////update video in the database
+                //_context.Update(originVideo);
+                //_context.SaveChanges();
             }
-            return videoDTO;
+            return NoContent(); 
         }
 
         //PUT with PATCH to handle isFavourite
@@ -263,7 +238,47 @@ namespace ScribrAPI.Controllers
 
         }
 
+        // GET: api/Videos
+        [HttpGet("GetRandomVideo")]
+        public async Task<ActionResult<IEnumerable<Video>>> GetRandomVideo()
+        {
+            // Removes all videos with empty transcription
 
+            var sizeOfList = _context.Video.ToListAsync().Result.Count;
+            bool isget = false;
+
+            // initialize transcription
+            var ivideo = await _context.Video.FindAsync(0);
+            // Choose transcriptions that has the phrase 
+            var videos = await _context.Video.Select(video => new Video
+            {
+                VideoId = video.VideoId,
+                VideoTitle = video.VideoTitle,
+                VideoLength = video.VideoLength,
+                WebUrl = video.WebUrl,
+                ThumbnailUrl = video.ThumbnailUrl,
+                IsFavourite = false,
+                // Transcription = video.Transcription
+            }).ToListAsync();
+
+            // only break after it finds a non-null transcription
+            while (isget == false)
+            {
+                // randomize the id
+                Random rnd = new Random();
+                int id = _context.Video.ToListAsync().Result[rnd.Next(0, sizeOfList)].VideoId;
+
+                // find the transcription based on the generated id
+                ivideo = await _context.Video.FindAsync(id);
+
+                if (ivideo != null)
+                {
+                    isget = true;
+                }
+                videos.RemoveAll(video => video.VideoId != id);
+            }
+            return Ok(videos);
+        }
 
 
         private bool VideoExists(int id)
