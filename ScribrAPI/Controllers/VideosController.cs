@@ -41,6 +41,34 @@ namespace ScribrAPI.Controllers
             return await _context.Video.ToListAsync();
         }
 
+        // GET: api/Videos
+        [HttpGet("GetRandomVideo")]
+        public async Task<ActionResult<Video>> GetRandomVideo()
+        {
+            var sizeOfList = _context.Video.ToListAsync().Result.Count;
+            bool isget = false;
+
+            // initialize transcription
+            var video = await _context.Video.FindAsync(0);
+
+            // only break after it finds a non-null transcription
+            while (isget == false)
+            {
+                // randomize the id
+                Random rnd = new Random();
+                int id = _context.Video.ToListAsync().Result[rnd.Next(0, sizeOfList)].VideoId;
+
+                // find the transcription based on the generated id
+                video = await _context.Video.FindAsync(id);
+
+                if (video != null)
+                {
+                    isget = true;
+                }
+            }
+            return video;
+        }
+
         // GET: api/Videos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Video>> GetVideo(int id)
