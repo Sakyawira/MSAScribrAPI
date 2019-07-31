@@ -113,6 +113,30 @@ namespace ScribrAPI.Controllers
             return NoContent();
         }
 
+        //PUT with PATCH to handle CancelisFavourite
+        [HttpPatch("CancelFav/")]
+        public VideoDTO Cancel([FromBody]JsonPatchDocument<VideoDTO> videoPatch)
+        {
+            var sizeOfList = _context.Video.ToListAsync().Result.Count;
+            Video originVideo = videoRepository.GetVideoByID(_context.Video.ToListAsync().Result[0].VideoId);
+            VideoDTO videoDTO = _mapper.Map<VideoDTO>(originVideo);
+            for (int i = 0; i <= sizeOfList; i++)
+            {
+                //get original video object from the database
+                originVideo = videoRepository.GetVideoByID(_context.Video.ToListAsync().Result[i].VideoId);
+                //use automapper to map that to DTO object
+                videoDTO = _mapper.Map<VideoDTO>(originVideo);
+                //apply the patch to that DTO
+                videoPatch.ApplyTo(videoDTO);
+                //use automapper to map the DTO back ontop of the database object
+                _mapper.Map(videoDTO, originVideo);
+                //update video in the database
+                _context.Update(originVideo);
+                _context.SaveChanges();
+            }
+            return videoDTO;
+        }
+
         //PUT with PATCH to handle isFavourite
         [HttpPatch("update/{id}")]
         public VideoDTO Patch(int id, [FromBody]JsonPatchDocument<VideoDTO> videoPatch)

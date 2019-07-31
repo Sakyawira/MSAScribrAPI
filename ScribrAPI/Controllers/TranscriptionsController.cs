@@ -70,9 +70,15 @@ namespace ScribrAPI.Controllers
                 Transcription = video.Transcription.Where(tran => tran.Phrase.Contains(transcription.Phrase)).ToList()
             }).ToListAsync();
 
+            for (int i = 0; i < videos.Count; i++)
+            {
+                videos[i].IsFavourite = false;
+            }
+
             // Removes all videos with empty transcription
             videos.RemoveAll(video => video.Transcription.Count == 0);
             videos.RemoveRange(1, videos.Count - 1);
+            videos[0].IsFavourite = true;
             return Ok(videos);
 
         }
