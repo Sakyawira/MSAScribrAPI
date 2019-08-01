@@ -266,8 +266,17 @@ namespace ScribrAPI.Controllers
             {
                 // randomize the id
                 Random rnd = new Random();
-                int id = _context.Video.ToListAsync().Result[rnd.Next(0, sizeOfList)].VideoId;
-
+                int rng = rnd.Next(0, sizeOfList);
+                int id = _context.Video.ToListAsync().Result[rng].VideoId;
+                int id2 = _context.Video.ToListAsync().Result[rng].VideoId;
+                if (rng != 0)
+                {
+                    id2 = _context.Video.ToListAsync().Result[rng - 1].VideoId;
+                }
+                else if (rng != videos.Count)
+                {
+                    id2 = _context.Video.ToListAsync().Result[rng + 1].VideoId;
+                }
                 // find the transcription based on the generated id
                 ivideo = await _context.Video.FindAsync(id);
 
@@ -275,7 +284,12 @@ namespace ScribrAPI.Controllers
                 {
                     isget = true;
                 }
-                videos.RemoveAll(video => video.VideoId != id);
+                  videos.RemoveAll(video => video.VideoId != id && video.VideoId != id2);
+                //if (rng != 0 && rng != videos.Count)
+                //{
+                //    videos.RemoveRange(0, rng);
+                //    videos.RemoveRange(rng + 2, );
+                //}
             }
             return Ok(videos);
         }
