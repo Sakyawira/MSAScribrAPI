@@ -284,7 +284,8 @@ namespace ScribrAPI.Controllers
                 {
                     isget = true;
                 }
-                  videos.RemoveAll(video => video.VideoId != id && video.VideoId != id2);
+                videos.RemoveAll(video => video.Transcription.Count == 0);
+                videos.RemoveAll(video => video.VideoId != id && video.VideoId != id2);
                 //if (rng != 0 && rng != videos.Count)
                 //{
                 //    videos.RemoveRange(0, rng);
