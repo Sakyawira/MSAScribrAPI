@@ -64,7 +64,8 @@ namespace ScribrAPI
             // Make sure the CORS middleware is ahead of SignalR.
             app.UseCors(builder =>
             {
-                builder.WithOrigins("https://sakyafrontend.azurewebsites.net/")
+                builder.AllowAnyOrigin()//("https://sakyafrontend.azurewebsites.net/")
+               
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
@@ -77,10 +78,11 @@ namespace ScribrAPI
                 routes.MapHub<SignalrHub>("/hub");
             });
 
-            app.UseCors(builder =>
-            {
-                builder.WithOrigins("https://sakyafrontend.azurewebsites.net/").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
-            });
+            //app.UseCors(builder =>
+            //{
+            //    builder.WithOrigins("https://sakyafrontend.azurewebsites.net/").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+            //});
+
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
